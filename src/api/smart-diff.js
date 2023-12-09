@@ -1,9 +1,9 @@
 import request from '@/utils/diff-request'
 
-export function getAllTasks() {
+export function getAllTasks(query) {
   return request({
     url: '/api/task/get_all_task',
-    method: 'get'
-    //    params: { name }
+    method: 'get',
+    params: query
   })
 }

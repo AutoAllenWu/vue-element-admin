@@ -71,8 +71,9 @@
         </template>
       </el-table-column>
       <el-table-column label="任务状态" min-width="150px">
-        <template slot-scope="{row}">
-          <span>{{ getStatusText(row.status) }}</span>
+        <template slot-scope="{row}" type="success">
+          <!--          <span><el-tag class="tag-item" @type="getTagType(row.status)" > {{ getStatusText(row.status) }}</el-tag></span>-->
+          <span><el-tag class="tag-item" :type="row.status ===4 || row.status ===99 ? 'success' : 'info'"> {{ getStatusText(row.status) }}</el-tag></span>
         </template>
       </el-table-column>
       <el-table-column label="发起人" min-width="150px">
@@ -131,7 +132,7 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page_num" :limit.sync="listQuery.page_size" @pagination="getTaskList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
@@ -186,6 +187,8 @@ import { getAllTasks } from '@/api/smart-diff'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { toggleClass } from '@/utils'
+import '@/assets/custom-theme/index.css'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -224,8 +227,9 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
+        page_num: 1,
+        page_size: 20,
+        // page / limit
         // importance: undefined,
         // title: undefined,
         // type: undefined,
@@ -286,6 +290,15 @@ export default {
           return ''
       }
     },
+    getTagType(status) {
+      switch (status) {
+        case 4:
+        case 99:
+          return 'success'
+        default:
+          return 'info'
+      }
+    },
     getTaskList() {
       this.listLoading = true
       getAllTasks(this.listQuery).then(response => {
@@ -299,7 +312,7 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.page_nume = 1
       this.getTaskList()
     },
     handleModifyStatus(row, status) {
